@@ -1,0 +1,28 @@
+{
+    "app_name": "My App",
+    "application_id": "com.example.myapp",
+    "namespace": "{{ cookiecutter.application_id }}",
+    "min_sdk": 27,
+    "project_slug": "{{ cookiecutter.app_name | slugify }}",
+    "__namespace_dir": "{{ cookiecutter.namespace.replace('.', '/') }}",
+    "_copy_without_render": [
+        "*.jar",
+        "*.webp",
+        "gradlew",
+        "gradlew.bat",
+        ".gitignore",
+        ".gitattributes",
+        "app/.gitignore",
+        ".idea/gradle.xml",
+        ".idea/misc.xml",
+        ".idea/compiler.xml",
+        ".idea/.gitignore"
+    ],
+    "__prompts__": {
+        "app_name": "App name",
+        "application_id": "Application ID (e.g. com.example.myapp)",
+        "namespace": "Kotlin namespace",
+        "min_sdk": "Minimum SDK version",
+        "project_slug": "Target folder name"
+    }
+}
