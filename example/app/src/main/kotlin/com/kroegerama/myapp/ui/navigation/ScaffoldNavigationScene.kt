@@ -83,7 +83,7 @@ data class ScaffoldNavigationScene<T : Any>(
                         modifier = Modifier
                             .cacheSize(!isMovableContentCaller)
                             .sharedElement(
-                                rememberSharedContentState("bottom.bar"),
+                                rememberSharedContentState("snackbar.host"),
                                 animatedContentScope
                             )
                     ) { data ->
