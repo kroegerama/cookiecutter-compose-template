@@ -9,6 +9,8 @@ import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
+import androidx.lifecycle.viewmodel.ViewModelStoreProvider
+import androidx.lifecycle.viewmodel.compose.rememberViewModelStoreProvider
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -64,16 +66,19 @@ class NavigationState(
 fun NavigationState.toEntries(
     entryProvider: (NavKey) -> NavEntry<NavKey>
 ): SnapshotStateList<NavEntry<NavKey>> {
+    val providers: Map<NavKey, ViewModelStoreProvider> = backStacks.mapValues { (key, _) ->
+        rememberViewModelStoreProvider(key = key)
+    }
 
-    val decoratedEntries = backStacks.mapValues { (_, stack) ->
+    val decoratedEntries = backStacks.mapValues { (key, stack) ->
         val decorators: List<NavEntryDecorator<NavKey>> = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
+            rememberViewModelStoreNavEntryDecorator(providers.getValue(key)),
         )
         rememberDecoratedNavEntries(
             backStack = stack,
             entryDecorators = decorators,
-            entryProvider = entryProvider
+            entryProvider = entryProvider,
         )
     }
 
