@@ -63,6 +63,7 @@ fun MainActivityContent() {
                 NavDisplay(
                     entries = navEntries,
                     sceneDecoratorStrategies = listOf(scaffoldNavigationStrategy),
+                    sharedTransitionScope = this,
                     transitionSpec = transitionSpec(),
                     popTransitionSpec = popTransitionSpec(),
                     predictivePopTransitionSpec = predictivePopTransitionSpec(),
