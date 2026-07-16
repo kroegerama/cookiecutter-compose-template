@@ -56,14 +56,14 @@ private fun ImageScreenContent(
         color = MaterialTheme.colorScheme.background,
         modifier = Modifier.fillMaxSize()
     ) {
-        Column {
+        Column(Modifier.safeDrawingPadding()) {
             if (needsBackButton) {
                 OutlinedButtonSmall(
                     onClick = actions.onNavigateBack,
                     text = "Back"
                 )
             }
-            Text("Details", Modifier.safeDrawingPadding())
+            Text("Details")
 
             AsyncImage(
                 model = "",
