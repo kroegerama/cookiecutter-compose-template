@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,16 +19,17 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
 import com.kroegerama.kmp.kaiteki.compose.components.ButtonMedium
 import com.kroegerama.kmp.kaiteki.compose.components.ButtonSmall
-import dagger.hilt.android.lifecycle.HiltViewModel
 import {{ cookiecutter.namespace }}.controller.ProgressController
 import {{ cookiecutter.namespace }}.ui.navigation.Navigator
 import {{ cookiecutter.namespace }}.ui.navigation.RootNavKey
 import {{ cookiecutter.namespace }}.ui.scaffold.SnackbarController
 import {{ cookiecutter.namespace }}.ui.theme.AppTheme
 import {{ cookiecutter.namespace }}.ui.theme.dimensions
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun StartScreen(
@@ -48,7 +48,6 @@ fun StartScreen(
     )
 }
 
-@Stable
 data class StartScreenUiState(
     val greeting: String
 )
@@ -100,7 +99,7 @@ class StartScreenViewModel @Inject constructor(
     fun performProgress() {
         viewModelScope.launch {
             progressController.loadWithProgress {
-                delay(2000)
+                delay(2000.milliseconds)
                 snackbarController.showSuccess("Success!!!")
             }
         }

@@ -30,7 +30,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "compose-app-generated"
+rootProject.name = "example"
 
 include(
     ":app",

@@ -11,6 +11,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -43,6 +44,7 @@ private fun Typography() {
                         .weight(1f)
                         .padding(8.dp)
                 ) {
+                    Text("Default", Modifier.align(Alignment.CenterHorizontally))
                     listOf(
                         "displayLarge" to MaterialTheme.typography.displayLarge,
                         "displayMedium" to MaterialTheme.typography.displayMedium,
@@ -79,6 +81,7 @@ private fun Typography() {
                         .weight(1f)
                         .padding(8.dp)
                 ) {
+                    Text("Emphasized", Modifier.align(Alignment.CenterHorizontally))
                     listOf(
                         "displayLargeEmphasized" to MaterialTheme.typography.displayLargeEmphasized,
                         "displayMediumEmphasized" to MaterialTheme.typography.displayMediumEmphasized,

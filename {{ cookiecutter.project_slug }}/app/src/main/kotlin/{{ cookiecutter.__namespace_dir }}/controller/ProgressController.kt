@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 class ProgressController @Inject constructor() {
@@ -27,7 +28,7 @@ class ProgressController @Inject constructor() {
             block().also {
                 val delta = minDismiss - System.currentTimeMillis()
                 if (delta > 50) {
-                    delay(delta)
+                    delay(delta.milliseconds)
                 }
             }
         } finally {

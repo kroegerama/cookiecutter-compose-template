@@ -11,6 +11,9 @@ class Navigator(
         if (route in state.backStacks.keys) {
             // This is a top level route, just switch to it
             state.topLevelRoute = route
+            if (singleTop) {
+                state.backStacks[state.topLevelRoute]?.removeAll { it::class != route::class }
+            }
         } else {
             if (singleTop) {
                 state.backStacks[state.topLevelRoute]?.removeAll { it::class == route::class }

@@ -1,13 +1,14 @@
 package com.kroegerama.myapp.ui.navigation
 
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.metadata
+import com.kroegerama.kmp.kaiteki.compose.navigation.ScaffoldSceneDecorator
+import com.kroegerama.myapp.ui.screens.ImageScreen
 import com.kroegerama.myapp.ui.screens.StartScreen
 import kotlinx.serialization.Serializable
 
@@ -21,24 +22,24 @@ sealed interface RootNavKey : NavKey {
 
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 fun rootEntryProvider(
     navigator: Navigator
 ): (NavKey) -> NavEntry<NavKey> = entryProvider {
     entry<RootNavKey.Start>(
-        metadata = metadata {
-            put(TopAppBarKey) {
-                TopAppBar(
-                    title = { Text("Hello World") }
-                )
-            }
-            put(BottomBarKey, true)
+        metadata = ListDetailSceneStrategy.listPane() + ScaffoldSceneDecorator.topAppBar {
+            CenterAlignedTopAppBar({ Text("Hello World") })
         }
     ) {
         StartScreen(
             navigator = navigator
         )
     }
-    entry<RootNavKey.Details> {
-        Text("Details", Modifier.safeDrawingPadding())
+    entry<RootNavKey.Details>(
+        metadata = ListDetailSceneStrategy.detailPane()
+    ) {
+        ImageScreen(
+            navigator = navigator
+        )
     }
 }

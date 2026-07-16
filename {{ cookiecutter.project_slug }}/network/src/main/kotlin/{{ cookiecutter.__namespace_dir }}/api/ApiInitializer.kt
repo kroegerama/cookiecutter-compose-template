@@ -23,8 +23,6 @@ import io.ktor.client.plugins.auth.providers.RefreshTokensParams
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequest
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
 import logcat.logcat
 
 class ApiInitializer : Initializer<Unit> {

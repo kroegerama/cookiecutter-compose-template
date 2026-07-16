@@ -71,9 +71,12 @@ dependencies {
     implementation(libs.bundles.kaiteki)
     implementation(libs.bundles.androidx.lifecycle)
     implementation(libs.bundles.androidx.navigation3)
+    implementation(libs.bundles.compose.material3.adaptive)
+    implementation(libs.bundles.coil)
 
     // androidx/kotlinx
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.concurrent.futures)
     implementation(libs.androidx.core)
     implementation(libs.androidx.startup)
     implementation(libs.androidx.window)
@@ -89,6 +92,7 @@ dependencies {
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.androidx.hilt.compiler)
+    ksp(libs.kotlin.metadata)
 
     // utilities
     implementation(libs.logcat)
@@ -98,6 +102,7 @@ dependencies {
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material3.adaptive.navigation.suite)
 
     // test
     testImplementation(libs.junit)
@@ -116,12 +121,11 @@ dependencies {
 }
 
 kotlin {
-    val jvmVersion: String by project
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(jvmVersion)
+        languageVersion = JavaLanguageVersion.of(21)
     }
     compilerOptions {
-        jvmTarget = JvmTarget.fromTarget(jvmVersion)
+        jvmTarget = JvmTarget.JVM_21
         freeCompilerArgs.addAll(
             "-Xannotation-default-target=param-property",
             "-Xcontext-parameters"
@@ -136,12 +140,6 @@ kotlin {
             "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi"
         )
     }
-}
-
-// prepare for cases when room is added
-ksp {
-    arg("room.incremental", "true")
-    arg("room.schemaLocation", projectDir.resolve("schemas").path)
 }
 
 composeCompiler {

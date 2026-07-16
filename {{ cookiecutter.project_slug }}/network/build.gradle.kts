@@ -26,12 +26,11 @@ android {
 }
 
 kotlin {
-    val jvmVersion: String by project
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(jvmVersion)
+        languageVersion = JavaLanguageVersion.of(21)
     }
     compilerOptions {
-        jvmTarget = JvmTarget.fromTarget(jvmVersion)
+        jvmTarget = JvmTarget.JVM_21
     }
 }
 
@@ -61,7 +60,7 @@ val spec = layout.projectDirectory.file("spec.yaml")
 
 kmpgen {
     spec(
-        packageName = android.namespace!!
+        packageName = "{{ cookiecutter.namespace }}.api"
     ) {
         specFile = spec
     }
@@ -69,6 +68,7 @@ kmpgen {
 
 tasks.register<Download>("downloadSpec") {
     group = "kmpgen"
+    description = "Download the latest OpenAPI spec"
     src(specUrl)
     dest(spec)
     overwrite(true)
