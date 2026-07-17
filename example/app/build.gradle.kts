@@ -29,10 +29,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    base.archivesName = defaultConfig.run {
-        "$applicationId-$versionName-b$versionCode"
-    }
-
     androidResources {
         generateLocaleConfig = true
     }
@@ -62,6 +58,12 @@ android {
         language {
             enableSplit = false
         }
+    }
+}
+
+base {
+    archivesName = android.defaultConfig.run {
+        "$applicationId-$versionName-b$versionCode"
     }
 }
 
