@@ -128,10 +128,6 @@ kotlin {
     }
     compilerOptions {
         jvmTarget = JvmTarget.JVM_21
-        freeCompilerArgs.addAll(
-            "-Xannotation-default-target=param-property",
-            "-Xcontext-parameters"
-        )
         optIn.addAll(
             "kotlin.uuid.ExperimentalUuidApi",
             "kotlin.time.ExperimentalTime",
