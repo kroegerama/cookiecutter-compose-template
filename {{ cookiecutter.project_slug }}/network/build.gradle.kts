@@ -17,7 +17,7 @@ android {
     }
     defaultConfig {
         minSdk {
-            version = release(27)
+            version = release({{ cookiecutter.min_sdk }})
         }
     }
     compileOptions {
