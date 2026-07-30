@@ -2,8 +2,11 @@ package {{ cookiecutter.namespace }}.ui.scaffold
 
 import android.content.Context
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -11,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.EntryPoint
@@ -64,6 +68,27 @@ class SnackbarController @Inject constructor(
             channel.receiveAsFlow().collectLatest { visuals ->
                 snackbarHostState.showSnackbar(visuals)
             }
+        }
+    }
+}
+
+@Composable
+fun AppSnackbarHost(snackbarHostState: SnackbarHostState) {
+    SnackbarHost(
+        hostState = snackbarHostState
+    ) { data ->
+        when (val visuals = data.visuals) {
+            is SnackbarVisuals -> Snackbar(
+                snackbarData = data,
+                containerColor = visuals.containerColor,
+                contentColor = visuals.contentColor,
+                modifier = Modifier.safeDrawingPadding()
+            )
+
+            else -> Snackbar(
+                snackbarData = data,
+                modifier = Modifier.safeDrawingPadding()
+            )
         }
     }
 }

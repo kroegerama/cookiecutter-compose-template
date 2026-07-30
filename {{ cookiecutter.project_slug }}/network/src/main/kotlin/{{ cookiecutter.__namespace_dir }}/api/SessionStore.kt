@@ -14,10 +14,12 @@ import {{ cookiecutter.namespace }}.api.model.LocalSessionData
 import io.ktor.client.plugins.auth.authProvider
 import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -60,11 +62,15 @@ class SessionStore @Inject constructor(
     }
 
     suspend fun clearBearer() {
-        dataStore.edit { preferences ->
-            preferences.remove(KEY_SESSION)
-            preferences.remove(KEY_REFRESH)
+        // NonCancellable, so the token cache is always cleared, even if the caller's
+        // scope gets cancelled as a consequence of the logged-out state emission
+        withContext(NonCancellable) {
+            dataStore.edit { preferences ->
+                preferences.remove(KEY_SESSION)
+                preferences.remove(KEY_REFRESH)
+            }
+            Api.client.authProvider<BearerAuthProvider>()?.clearToken()
         }
-        Api.client.authProvider<BearerAuthProvider>()?.clearToken()
     }
 
     companion object {

@@ -19,6 +19,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
 import com.kroegerama.kmp.kaiteki.compose.components.ButtonMedium
 import com.kroegerama.kmp.kaiteki.compose.components.ButtonSmall
+import com.kroegerama.myapp.api.SessionStore
 import com.kroegerama.myapp.controller.ProgressController
 import com.kroegerama.myapp.ui.navigation.Navigator
 import com.kroegerama.myapp.ui.navigation.RootNavKey
@@ -39,7 +40,8 @@ fun StartScreen(
 
     val actions = StartScreenActions(
         onNavigate = navigator::navigate,
-        onProgress = viewModel::performProgress
+        onProgress = viewModel::performProgress,
+        onLogout = viewModel::performLogout
     )
 
     StartScreenContent(
@@ -54,7 +56,8 @@ data class StartScreenUiState(
 
 private data class StartScreenActions(
     val onNavigate: (NavKey) -> Unit = {},
-    val onProgress: () -> Unit = {}
+    val onProgress: () -> Unit = {},
+    val onLogout: () -> Unit = {}
 )
 
 @Composable
@@ -84,6 +87,10 @@ private fun StartScreenContent(
                 onClick = { actions.onNavigate(RootNavKey.Details) },
                 text = "Details"
             )
+            ButtonSmall(
+                onClick = actions.onLogout,
+                text = "Logout"
+            )
         }
     }
 }
@@ -91,7 +98,8 @@ private fun StartScreenContent(
 @HiltViewModel
 class StartScreenViewModel @Inject constructor(
     private val progressController: ProgressController,
-    private val snackbarController: SnackbarController
+    private val snackbarController: SnackbarController,
+    private val sessionStore: SessionStore
 ) : ViewModel() {
 
     var uiState by mutableStateOf(StartScreenUiState("Hello App"))
@@ -102,6 +110,12 @@ class StartScreenViewModel @Inject constructor(
                 delay(2000.milliseconds)
                 snackbarController.showSuccess("Success!!!")
             }
+        }
+    }
+
+    fun performLogout() {
+        viewModelScope.launch {
+            sessionStore.clearBearer()
         }
     }
 }

@@ -1,20 +1,20 @@
 package com.kroegerama.myapp.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.recalculateWindowInsets
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
@@ -32,54 +32,54 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.rememberViewModelStoreProvider
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.runtime.result.rememberResultEventBusNavEntryDecorator
+import androidx.navigation3.scene.SceneDecoratorStrategy
 import androidx.navigation3.ui.NavDisplay
+import com.kroegerama.kmp.kaiteki.compose.navigation.rememberAlertDialogSceneStrategy
+import com.kroegerama.kmp.kaiteki.compose.navigation.rememberBottomSheetSceneStrategy
 import com.kroegerama.kmp.kaiteki.compose.navigation.rememberScaffoldSceneDecorator
 import com.kroegerama.kmp.kaiteki.compose.rememberChromeCustomTabUriHandler
 import com.kroegerama.myapp.ui.dialogs.LoadingDialog
 import com.kroegerama.myapp.ui.icons.AppIcons
 import com.kroegerama.myapp.ui.icons.Cookie
+import com.kroegerama.myapp.ui.navigation.LoginNavKey
 import com.kroegerama.myapp.ui.navigation.Navigator
 import com.kroegerama.myapp.ui.navigation.RootNavKey
+import com.kroegerama.myapp.ui.navigation.loginEntryProvider
 import com.kroegerama.myapp.ui.navigation.rememberNavigationState
 import com.kroegerama.myapp.ui.navigation.rememberSceneDecorator
 import com.kroegerama.myapp.ui.navigation.rootEntryProvider
 import com.kroegerama.myapp.ui.navigation.toEntries
+import com.kroegerama.myapp.ui.scaffold.AppSnackbarHost
 import com.kroegerama.myapp.ui.scaffold.LocalSharedTransitionScope
 import com.kroegerama.myapp.ui.scaffold.LocalSnackbarController
-import com.kroegerama.myapp.ui.scaffold.SnackbarVisuals
 import com.kroegerama.myapp.ui.scaffold.rememberSnackbarController
 import com.kroegerama.myapp.ui.theme.AppTheme
 import com.kroegerama.myapp.ui.theme.popTransitionSpec
 import com.kroegerama.myapp.ui.theme.predictivePopTransitionSpec
 import com.kroegerama.myapp.ui.theme.transitionSpec
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MainActivityContent() {
     val viewModel = hiltViewModel<MainActivityViewModel>()
 
     val chromeCustomTabUriHandler = rememberChromeCustomTabUriHandler()
 
-    val navigationState = rememberNavigationState(
-        startRoute = RootNavKey.Start,
-        topLevelRoutes = setOf(RootNavKey.Start)
-    )
-    val navigator = remember { Navigator(navigationState) }
-
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarController = rememberSnackbarController()
     snackbarController.LaunchSnackbarEffect(snackbarHostState)
 
-    val entryProvider = rootEntryProvider(navigator)
-    val navEntries = navigationState.toEntries(entryProvider)
+    val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val loadingState by viewModel.loading.collectAsStateWithLifecycle()
 
     val adaptiveInfo = currentWindowAdaptiveInfoV2()
-    val directive = calculatePaneScaffoldDirective(adaptiveInfo)
-    val listDetailSceneStrategy = rememberListDetailSceneStrategy<NavKey>(
-        directive = directive,
-    )
 
     AppTheme {
         SharedTransitionLayout {
@@ -88,75 +88,22 @@ fun MainActivityContent() {
                 LocalSnackbarController provides snackbarController,
                 LocalSharedTransitionScope provides this
             ) {
-                val navigationSuiteScaffoldState = rememberNavigationSuiteScaffoldState(
-                    initialValue = NavigationSuiteScaffoldValue.Hidden
-                )
-                val scaffoldSceneDecorator = rememberScaffoldSceneDecorator<NavKey>(this)
-                val sceneDecorator = rememberSceneDecorator<NavKey>(
-                    onShowNavigationSuite = { show ->
-                        if (show) {
-                            navigationSuiteScaffoldState.show()
+                loggedIn?.let { isLoggedIn ->
+                    AnimatedContent(
+                        targetState = isLoggedIn,
+                        label = "session"
+                    ) { state ->
+                        if (state) {
+                            LoggedInContent(
+                                snackbarHostState = snackbarHostState,
+                                adaptiveInfo = adaptiveInfo
+                            )
                         } else {
-                            navigationSuiteScaffoldState.hide()
-                        }
-                    }
-                )
-
-                NavigationSuiteScaffold(
-                    navigationItemVerticalArrangement = Arrangement.Center,
-                    navigationSuiteType = NavigationSuiteScaffoldDefaults.navigationSuiteType(adaptiveInfo),
-                    state = navigationSuiteScaffoldState,
-                    navigationItems = {
-                        NavigationItems.entries.forEach { nav ->
-                            NavigationSuiteItem(
-                                selected = navigationState.topLevelRoute == nav.route,
-                                onClick = {
-                                    navigator.navigate(nav.route)
-                                },
-                                icon = { Icon(nav.icon, nav.label()) },
-                                label = { Text(nav.label()) }
+                            LoginContent(
+                                snackbarHostState = snackbarHostState,
+                                adaptiveInfo = adaptiveInfo
                             )
                         }
-                    }
-                ) {
-                    Scaffold(
-                        snackbarHost = {
-                            SnackbarHost(
-                                hostState = snackbarHostState
-                            ) { data ->
-                                when (val visuals = data.visuals) {
-                                    is SnackbarVisuals -> Snackbar(
-                                        snackbarData = data,
-                                        containerColor = visuals.containerColor,
-                                        contentColor = visuals.contentColor,
-                                        modifier = Modifier.safeDrawingPadding()
-                                    )
-
-                                    else -> Snackbar(
-                                        snackbarData = data,
-                                        modifier = Modifier.safeDrawingPadding()
-                                    )
-                                }
-                            }
-                        },
-                        contentWindowInsets = WindowInsets(),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .recalculateWindowInsets()
-                    ) { innerPadding ->
-                        NavDisplay(
-                            entries = navEntries,
-                            sceneStrategies = listOf(listDetailSceneStrategy),
-                            sceneDecoratorStrategies = listOf(scaffoldSceneDecorator, sceneDecorator),
-                            sharedTransitionScope = this,
-                            transitionSpec = transitionSpec(),
-                            popTransitionSpec = popTransitionSpec(),
-                            predictivePopTransitionSpec = predictivePopTransitionSpec(),
-                            onBack = navigator::goBack,
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .consumeWindowInsets(innerPadding)
-                        )
                     }
                 }
                 loadingState?.let {
@@ -166,6 +113,132 @@ fun MainActivityContent() {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SharedTransitionScope.LoginContent(
+    snackbarHostState: SnackbarHostState,
+    adaptiveInfo: WindowAdaptiveInfo
+) {
+    val backStack = rememberNavBackStack(LoginNavKey.Login)
+    val viewModelStoreProvider = rememberViewModelStoreProvider(key = LoginNavKey.Login)
+    val navEntries = rememberDecoratedNavEntries(
+        backStack = backStack,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberResultEventBusNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(viewModelStoreProvider)
+        ),
+        entryProvider = loginEntryProvider()
+    )
+
+    NavScaffold(
+        snackbarHostState = snackbarHostState,
+        adaptiveInfo = adaptiveInfo,
+        entries = navEntries,
+        onBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun SharedTransitionScope.LoggedInContent(
+    snackbarHostState: SnackbarHostState,
+    adaptiveInfo: WindowAdaptiveInfo
+) {
+    val navigationState = rememberNavigationState(
+        startRoute = RootNavKey.Start,
+        topLevelRoutes = setOf(RootNavKey.Start)
+    )
+    val navigator = remember { Navigator(navigationState) }
+
+    val entryProvider = rootEntryProvider(navigator)
+    val navEntries = navigationState.toEntries(entryProvider)
+
+    val navigationSuiteScaffoldState = rememberNavigationSuiteScaffoldState(
+        initialValue = NavigationSuiteScaffoldValue.Hidden
+    )
+    val scaffoldSceneDecorator = rememberScaffoldSceneDecorator<NavKey>(this)
+    val sceneDecorator = rememberSceneDecorator<NavKey>(
+        onShowNavigationSuite = { show ->
+            if (show) {
+                navigationSuiteScaffoldState.show()
+            } else {
+                navigationSuiteScaffoldState.hide()
+            }
+        }
+    )
+
+    NavigationSuiteScaffold(
+        navigationItemVerticalArrangement = Arrangement.Center,
+        navigationSuiteType = NavigationSuiteScaffoldDefaults.navigationSuiteType(adaptiveInfo),
+        state = navigationSuiteScaffoldState,
+        navigationItems = {
+            NavigationItems.entries.forEach { nav ->
+                NavigationSuiteItem(
+                    selected = navigationState.topLevelRoute == nav.route,
+                    onClick = {
+                        navigator.navigate(nav.route)
+                    },
+                    icon = { Icon(nav.icon, nav.label()) },
+                    label = { Text(nav.label()) }
+                )
+            }
+        }
+    ) {
+        NavScaffold(
+            snackbarHostState = snackbarHostState,
+            adaptiveInfo = adaptiveInfo,
+            entries = navEntries,
+            onBack = navigator::goBack,
+            sceneDecoratorStrategies = listOf(scaffoldSceneDecorator, sceneDecorator),
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun SharedTransitionScope.NavScaffold(
+    snackbarHostState: SnackbarHostState,
+    adaptiveInfo: WindowAdaptiveInfo,
+    entries: List<NavEntry<NavKey>>,
+    onBack: () -> Unit,
+    sceneDecoratorStrategies: List<SceneDecoratorStrategy<NavKey>> = emptyList()
+) {
+    val directive = calculatePaneScaffoldDirective(adaptiveInfo)
+    val bottomSheetSceneStrategy = rememberBottomSheetSceneStrategy<NavKey>()
+    val alertDialogSceneStrategy = rememberAlertDialogSceneStrategy<NavKey>()
+    val listDetailSceneStrategy = rememberListDetailSceneStrategy<NavKey>(
+        directive = directive,
+    )
+
+    Scaffold(
+        snackbarHost = {
+            AppSnackbarHost(snackbarHostState)
+        },
+        contentWindowInsets = WindowInsets(),
+        modifier = Modifier
+            .fillMaxSize()
+            .recalculateWindowInsets()
+    ) { innerPadding ->
+        NavDisplay(
+            entries = entries,
+            sceneStrategies = listOf(
+                bottomSheetSceneStrategy,
+                alertDialogSceneStrategy,
+                listDetailSceneStrategy
+            ),
+            sceneDecoratorStrategies = sceneDecoratorStrategies,
+            sharedTransitionScope = this@NavScaffold,
+            transitionSpec = transitionSpec(),
+            popTransitionSpec = popTransitionSpec(),
+            predictivePopTransitionSpec = predictivePopTransitionSpec(),
+            onBack = onBack,
+            modifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+        )
     }
 }
 

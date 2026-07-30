@@ -2,40 +2,39 @@ package com.kroegerama.myapp
 
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.layout.WindowMetricsCalculator
 import androidx.window.layout.adapter.computeWindowSizeClass
-import dagger.hilt.android.AndroidEntryPoint
 import com.kroegerama.myapp.ui.MainActivityContent
+import com.kroegerama.myapp.ui.MainActivityViewModel
+import com.kroegerama.myapp.ui.theme.NavigationBarStyle
+import com.kroegerama.myapp.ui.theme.StatusBarStyle
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.Instant
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val viewModel by viewModels<MainActivityViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             fromSplash()
         }
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                scrim = Color.TRANSPARENT,
-                darkScrim = Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                scrim = Color.argb(0xe6, 0xFF, 0xFF, 0xFF),
-                darkScrim = Color.argb(0x80, 0x1b, 0x1b, 0x1b)
-            )
+            statusBarStyle = StatusBarStyle,
+            navigationBarStyle = NavigationBarStyle
         )
         updateOrientation()
         setContent {
@@ -52,7 +51,8 @@ class MainActivity : ComponentActivity() {
         content.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 val timeDone = Instant.now() >= end
-                return timeDone.also { done ->
+                val sessionLoaded = viewModel.loggedIn.value != null
+                return (timeDone && sessionLoaded).also { done ->
                     if (done) content.viewTreeObserver.removeOnPreDrawListener(this)
                 }
             }

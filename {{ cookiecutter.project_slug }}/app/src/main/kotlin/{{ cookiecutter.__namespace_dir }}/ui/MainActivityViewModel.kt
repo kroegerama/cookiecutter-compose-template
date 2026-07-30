@@ -1,13 +1,26 @@
 package {{ cookiecutter.namespace }}.ui
 
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import androidx.lifecycle.viewModelScope
+import {{ cookiecutter.namespace }}.api.SessionStore
 import {{ cookiecutter.namespace }}.controller.ProgressController
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val progressController: ProgressController
+    progressController: ProgressController,
+    sessionStore: SessionStore
 ) : ViewModel() {
     val loading = progressController.loading
+
+    // null = session state not yet loaded; the splash screen stays visible until it resolves
+    val loggedIn: StateFlow<Boolean?> = sessionStore.loggedInFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = null
+    )
 }
