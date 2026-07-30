@@ -34,6 +34,7 @@ import {{ cookiecutter.namespace }}.ui.icons.Cookie
 import {{ cookiecutter.namespace }}.ui.theme.AppTheme
 import {{ cookiecutter.namespace }}.ui.theme.dimensions
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun LoadingDialog(
@@ -98,7 +99,7 @@ private fun LoadingDialogPreview() {
 
             LaunchedEffect(show) {
                 if (show) {
-                    delay(4000)
+                    delay(4000.milliseconds)
                     show = false
                 }
             }

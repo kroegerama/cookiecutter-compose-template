@@ -12,7 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.kroegerama.kmp.kaiteki.compose.components.ButtonMedium
 import com.kroegerama.myapp.api.SessionStore
 import com.kroegerama.myapp.api.model.LocalSessionData
@@ -26,10 +29,11 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(backStack: NavBackStack<NavKey>) {
     val viewModel = hiltViewModel<LoginScreenViewModel>()
 
     val actions = LoginScreenActions(
+        onBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
         onLogin = viewModel::performLogin
     )
 
@@ -39,6 +43,7 @@ fun LoginScreen() {
 }
 
 private data class LoginScreenActions(
+    val onBack: () -> Unit = {},
     val onLogin: () -> Unit = {}
 )
 
@@ -61,7 +66,7 @@ private fun LoginScreenContent(
                 modifier = Modifier.padding(MaterialTheme.dimensions.small)
             )
             ButtonMedium(
-                onClick = actions.onLogin,
+                onClick = dropUnlessResumed { actions.onLogin() },
                 text = "Login"
             )
         }

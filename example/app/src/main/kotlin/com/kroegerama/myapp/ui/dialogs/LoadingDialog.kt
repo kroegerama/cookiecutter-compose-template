@@ -34,6 +34,7 @@ import com.kroegerama.myapp.ui.icons.Cookie
 import com.kroegerama.myapp.ui.theme.AppTheme
 import com.kroegerama.myapp.ui.theme.dimensions
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun LoadingDialog(
@@ -98,7 +99,7 @@ private fun LoadingDialogPreview() {
 
             LaunchedEffect(show) {
                 if (show) {
-                    delay(4000)
+                    delay(4000.milliseconds)
                     show = false
                 }
             }

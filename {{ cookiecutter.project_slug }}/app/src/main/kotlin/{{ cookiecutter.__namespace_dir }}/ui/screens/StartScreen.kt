@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
 import com.kroegerama.kmp.kaiteki.compose.components.ButtonMedium
@@ -84,11 +85,11 @@ private fun StartScreenContent(
                 text = "Progress"
             )
             ButtonSmall(
-                onClick = { actions.onNavigate(RootNavKey.Details) },
+                onClick = dropUnlessResumed { actions.onNavigate(RootNavKey.Details) },
                 text = "Details"
             )
             ButtonSmall(
-                onClick = actions.onLogout,
+                onClick = dropUnlessResumed { actions.onLogout() },
                 text = "Logout"
             )
         }

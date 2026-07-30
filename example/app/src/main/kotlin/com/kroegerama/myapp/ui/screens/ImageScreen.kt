@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation3.runtime.NavKey
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
@@ -59,7 +60,7 @@ private fun ImageScreenContent(
         Column(Modifier.safeDrawingPadding()) {
             if (needsBackButton) {
                 OutlinedButtonSmall(
-                    onClick = actions.onNavigateBack,
+                    onClick = dropUnlessResumed { actions.onNavigateBack() },
                     text = "Back"
                 )
             }

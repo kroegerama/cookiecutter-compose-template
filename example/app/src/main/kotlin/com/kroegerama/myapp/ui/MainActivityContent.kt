@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.compose.rememberViewModelStoreProvider
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -62,9 +63,6 @@ import com.kroegerama.myapp.ui.scaffold.LocalSharedTransitionScope
 import com.kroegerama.myapp.ui.scaffold.LocalSnackbarController
 import com.kroegerama.myapp.ui.scaffold.rememberSnackbarController
 import com.kroegerama.myapp.ui.theme.AppTheme
-import com.kroegerama.myapp.ui.theme.popTransitionSpec
-import com.kroegerama.myapp.ui.theme.predictivePopTransitionSpec
-import com.kroegerama.myapp.ui.theme.transitionSpec
 
 @Composable
 fun MainActivityContent() {
@@ -130,7 +128,7 @@ private fun SharedTransitionScope.LoginContent(
             rememberResultEventBusNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator(viewModelStoreProvider)
         ),
-        entryProvider = loginEntryProvider()
+        entryProvider = loginEntryProvider(backStack)
     )
 
     NavScaffold(
@@ -141,7 +139,6 @@ private fun SharedTransitionScope.LoginContent(
     )
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun SharedTransitionScope.LoggedInContent(
     snackbarHostState: SnackbarHostState,
@@ -178,7 +175,7 @@ private fun SharedTransitionScope.LoggedInContent(
             NavigationItems.entries.forEach { nav ->
                 NavigationSuiteItem(
                     selected = navigationState.topLevelRoute == nav.route,
-                    onClick = {
+                    onClick = dropUnlessResumed {
                         navigator.navigate(nav.route)
                     },
                     icon = { Icon(nav.icon, nav.label()) },
@@ -231,9 +228,6 @@ private fun SharedTransitionScope.NavScaffold(
             ),
             sceneDecoratorStrategies = sceneDecoratorStrategies,
             sharedTransitionScope = this@NavScaffold,
-            transitionSpec = transitionSpec(),
-            popTransitionSpec = popTransitionSpec(),
-            predictivePopTransitionSpec = predictivePopTransitionSpec(),
             onBack = onBack,
             modifier = Modifier
                 .padding(innerPadding)
