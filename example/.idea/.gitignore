@@ -4,3 +4,12 @@
 # Editor-based HTTP Client requests
 /httpRequests/
 /valkyrie_settings.xml
+# Machine-local IDE state
+/misc.xml
+/vcs.xml
+/AndroidProjectSystem.xml
+/runConfigurations.xml
+/deploymentTargetSelector.xml
+/deviceManager.xml
+/markdown.xml
+/inspectionProfiles/
