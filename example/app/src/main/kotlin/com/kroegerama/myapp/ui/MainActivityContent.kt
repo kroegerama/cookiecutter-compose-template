@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -76,6 +79,7 @@ fun MainActivityContent() {
 
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val loadingState by viewModel.loading.collectAsStateWithLifecycle()
+    val busy by viewModel.busy.collectAsStateWithLifecycle()
 
     val adaptiveInfo = currentWindowAdaptiveInfoV2()
 
@@ -104,6 +108,9 @@ fun MainActivityContent() {
                         }
                     }
                 }
+                if (busy) {
+                    InputBlocker()
+                }
                 loadingState?.let {
                     LoadingDialog(
                         label = it.label
@@ -112,6 +119,21 @@ fun MainActivityContent() {
             }
         }
     }
+}
+
+@Composable
+private fun InputBlocker() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+                    }
+                }
+            }
+    )
 }
 
 @Composable
