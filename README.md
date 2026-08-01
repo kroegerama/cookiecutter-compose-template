@@ -2,6 +2,8 @@
 
 Cookiecutter template for a modern Android app using Jetpack Compose.
 
+> Looking for Compose Multiplatform? Check out [cookiecutter-cmp-template](https://github.com/kroegerama/cookiecutter-cmp-template).
+
 ## Prerequisites
 
 - Git
