@@ -4,13 +4,13 @@ import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 class ProgressController @Inject constructor() {
+    private val active = mutableListOf<LoadingState>()
     private val _loading = MutableStateFlow<LoadingState?>(null)
     val loading = _loading.asStateFlow()
 
@@ -18,10 +18,12 @@ class ProgressController @Inject constructor() {
         label: String? = null,
         block: suspend () -> T
     ): T {
-        _loading.update {
-            LoadingState(
-                label = label
-            )
+        val state = LoadingState(
+            label = label
+        )
+        synchronized(active) {
+            active += state
+            _loading.value = state
         }
         val minDismiss = System.currentTimeMillis() + 100
         return try {
@@ -32,7 +34,10 @@ class ProgressController @Inject constructor() {
                 }
             }
         } finally {
-            _loading.update { null }
+            synchronized(active) {
+                active -= state
+                _loading.value = active.lastOrNull()
+            }
         }
     }
 

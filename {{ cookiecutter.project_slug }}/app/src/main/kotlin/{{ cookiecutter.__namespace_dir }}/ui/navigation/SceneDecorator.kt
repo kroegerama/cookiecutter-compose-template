@@ -49,7 +49,9 @@ fun <T : Any> rememberSceneDecorator(
 ): SceneDecorator<T> {
     val currentOnShowNavigationSuite by rememberUpdatedState(onShowNavigationSuite)
     return remember {
-        SceneDecorator(currentOnShowNavigationSuite)
+        SceneDecorator { show ->
+            currentOnShowNavigationSuite(show)
+        }
     }
 }
 

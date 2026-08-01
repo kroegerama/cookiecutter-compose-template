@@ -176,7 +176,11 @@ private fun SharedTransitionScope.LoggedInContent(
                 NavigationSuiteItem(
                     selected = navigationState.topLevelRoute == nav.route,
                     onClick = dropUnlessResumed {
-                        navigator.navigate(nav.route)
+                        if (navigationState.topLevelRoute == nav.route) {
+                            navigator.resetStack()
+                        } else {
+                            navigator.navigate(nav.route)
+                        }
                     },
                     icon = { Icon(nav.icon, nav.label()) },
                     label = { Text(nav.label()) }

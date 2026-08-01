@@ -1,9 +1,7 @@
 package com.kroegerama.myapp.controller
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.kroegerama.myapp.ProcessLifecycleOwner
 import com.kroegerama.myapp.api.SessionStore
 import kotlinx.coroutines.Job
@@ -23,11 +21,9 @@ class LogoutHandler @Inject constructor(
     fun init() {
         job?.cancel()
         job = lifecycleOwner.lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                sessionStore.loggedInFlow.collect { loggedIn ->
-                    if (!loggedIn) {
-                        dataStore.clear()
-                    }
+            sessionStore.loggedInFlow.collect { loggedIn ->
+                if (!loggedIn) {
+                    dataStore.clear()
                 }
             }
         }

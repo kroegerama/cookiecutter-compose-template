@@ -13,13 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.LocalListDetailSceneScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation3.runtime.NavKey
-import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import com.kroegerama.kmp.kaiteki.compose.components.OutlinedButtonSmall
 import com.kroegerama.kmp.kaiteki.compose.feature.blurHash
@@ -66,13 +66,11 @@ private fun ImageScreenContent(
             }
             Text("Details")
 
-            AsyncImage(
-                model = "",
-                contentDescription = null
-            )
-
+            val imageUrl = remember {
+                "https://images-assets.nasa.gov/image/SLS_KSC_Artemis%20II%20Rollout%201172026_20/SLS_KSC_Artemis%20II%20Rollout%201172026_20~orig.jpg?r=${Clock.System.now().epochSeconds}"
+            }
             SubcomposeAsyncImage(
-                model = "https://images-assets.nasa.gov/image/SLS_KSC_Artemis%20II%20Rollout%201172026_20/SLS_KSC_Artemis%20II%20Rollout%201172026_20~orig.jpg?r=${Clock.System.now().epochSeconds}",
+                model = imageUrl,
                 contentDescription = null,
                 alignment = Alignment.Center,
                 loading = {

@@ -104,6 +104,7 @@ class StartScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     var uiState by mutableStateOf(StartScreenUiState("Hello App"))
+        private set
 
     fun performProgress() {
         viewModelScope.launch {
