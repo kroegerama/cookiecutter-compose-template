@@ -24,7 +24,7 @@ import com.kroegerama.myapp.api.SessionStore
 import com.kroegerama.myapp.controller.ProgressController
 import com.kroegerama.myapp.ui.navigation.Navigator
 import com.kroegerama.myapp.ui.navigation.RootNavKey
-import com.kroegerama.myapp.ui.scaffold.SnackbarController
+import com.kroegerama.myapp.ui.scaffold.AppSnackbarController
 import com.kroegerama.myapp.ui.theme.AppTheme
 import com.kroegerama.myapp.ui.theme.dimensions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -99,7 +99,7 @@ private fun StartScreenContent(
 @HiltViewModel
 class StartScreenViewModel @Inject constructor(
     private val progressController: ProgressController,
-    private val snackbarController: SnackbarController,
+    private val snackbarController: AppSnackbarController,
     private val sessionStore: SessionStore
 ) : ViewModel() {
 
@@ -110,7 +110,7 @@ class StartScreenViewModel @Inject constructor(
         viewModelScope.launch {
             progressController.loadWithProgress {
                 delay(2000.milliseconds)
-                snackbarController.showSuccess("Success!!!")
+                snackbarController.show("Success!!!")
             }
         }
     }

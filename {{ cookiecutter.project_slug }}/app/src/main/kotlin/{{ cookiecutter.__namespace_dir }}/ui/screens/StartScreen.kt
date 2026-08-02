@@ -24,7 +24,7 @@ import {{ cookiecutter.namespace }}.api.SessionStore
 import {{ cookiecutter.namespace }}.controller.ProgressController
 import {{ cookiecutter.namespace }}.ui.navigation.Navigator
 import {{ cookiecutter.namespace }}.ui.navigation.RootNavKey
-import {{ cookiecutter.namespace }}.ui.scaffold.SnackbarController
+import {{ cookiecutter.namespace }}.ui.scaffold.AppSnackbarController
 import {{ cookiecutter.namespace }}.ui.theme.AppTheme
 import {{ cookiecutter.namespace }}.ui.theme.dimensions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -99,7 +99,7 @@ private fun StartScreenContent(
 @HiltViewModel
 class StartScreenViewModel @Inject constructor(
     private val progressController: ProgressController,
-    private val snackbarController: SnackbarController,
+    private val snackbarController: AppSnackbarController,
     private val sessionStore: SessionStore
 ) : ViewModel() {
 
@@ -110,7 +110,7 @@ class StartScreenViewModel @Inject constructor(
         viewModelScope.launch {
             progressController.loadWithProgress {
                 delay(2000.milliseconds)
-                snackbarController.showSuccess("Success!!!")
+                snackbarController.show("Success!!!")
             }
         }
     }
