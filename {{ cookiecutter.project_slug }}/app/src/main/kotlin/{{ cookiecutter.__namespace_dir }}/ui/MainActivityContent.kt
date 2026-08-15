@@ -66,6 +66,7 @@ import {{ cookiecutter.namespace }}.ui.scaffold.LocalSharedTransitionScope
 import {{ cookiecutter.namespace }}.ui.scaffold.LocalSnackbarController
 import {{ cookiecutter.namespace }}.ui.scaffold.rememberSnackbarController
 import {{ cookiecutter.namespace }}.ui.theme.AppTheme
+import {{ cookiecutter.namespace }}.ui.theme.rememberNavigationTransitionSpecs
 
 @Composable
 fun MainActivityContent() {
@@ -233,6 +234,7 @@ private fun SharedTransitionScope.NavScaffold(
     val listDetailSceneStrategy = rememberListDetailSceneStrategy<NavKey>(
         directive = directive,
     )
+    val animationSpecs = rememberNavigationTransitionSpecs<NavKey>()
 
     Scaffold(
         snackbarHost = {
@@ -252,6 +254,9 @@ private fun SharedTransitionScope.NavScaffold(
             ),
             sceneDecoratorStrategies = sceneDecoratorStrategies,
             sharedTransitionScope = this@NavScaffold,
+            transitionSpec = animationSpecs.push,
+            popTransitionSpec = animationSpecs.pop,
+            predictivePopTransitionSpec = animationSpecs.predictivePop,
             onBack = onBack,
             modifier = Modifier
                 .padding(innerPadding)
