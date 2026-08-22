@@ -6,6 +6,13 @@ updates:
       - "/{{ cookiecutter.project_slug }}"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 3
+      exclude:
+        - "androidx.*"
+        - "com.android*"
+        - "com.google*"
+        - "com.kroegerama*"
     groups:
       kotlin:
         patterns:
