@@ -49,6 +49,7 @@ dependencies {
 
     implementation(libs.logcat)
 
+    implementation(libs.bundles.ktor)
     debugImplementation(libs.chucker)
     releaseImplementation(libs.chucker.noop)
 

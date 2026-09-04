@@ -50,6 +50,11 @@ android {
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
     buildFeatures {
         buildConfig = true
         compose = true
@@ -65,6 +70,10 @@ base {
     archivesName = android.defaultConfig.run {
         "$applicationId-$versionName-b$versionCode"
     }
+}
+
+tasks.named { it == "packageReleaseBundle" }.configureEach {
+    dependsOn("test")
 }
 
 dependencies {
@@ -108,6 +117,9 @@ dependencies {
 
     // test
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.compose.ui.test.junit4)
