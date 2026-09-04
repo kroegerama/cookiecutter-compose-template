@@ -1,16 +1,13 @@
-package com.kroegerama.myapp.api
+package {{ cookiecutter.namespace }}.api
 
 import android.content.Context
 import android.os.Build
-import androidx.startup.Initializer
+import android.os.storage.StorageManager
 import arrow.core.getOrElse
-import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
-import com.kroegerama.myapp.api.model.ApiConfig
+import com.kroegerama.kmp.kaiteki.formatting.asHumanReadableBytes
+import {{ cookiecutter.namespace }}.api.model.ApiConfig
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
@@ -23,27 +20,22 @@ import io.ktor.client.plugins.auth.providers.RefreshTokensParams
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequest
+import logcat.asLog
 import logcat.logcat
+import okhttp3.Cache
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ApiInitializer : Initializer<Unit> {
+@Singleton
+class ApiSetup @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val apiConfig: ApiConfig,
+    private val sessionStore: SessionStore,
+    private val chuckerInterceptor: ChuckerInterceptor
+) {
 
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface ApiInitializerEntryPoint {
-        fun getApiConfig(): ApiConfig
-        fun getSessionStore(): SessionStore
-    }
-
-    private lateinit var context: Context
-    private lateinit var apiConfig: ApiConfig
-    private lateinit var sessionStore: SessionStore
-
-    override fun create(context: Context) {
-        val accessor = EntryPointAccessors.fromApplication<ApiInitializerEntryPoint>(context)
-        this.context = context
-        apiConfig = accessor.getApiConfig()
-        sessionStore = accessor.getSessionStore()
-
+    fun install() {
         Api.baseUrl = apiConfig.baseUrl
 
         Api.updateClient(
@@ -85,19 +77,19 @@ class ApiInitializer : Initializer<Unit> {
 
     private fun createHttpClient(
         decorator: HttpClientConfig<OkHttpConfig>.() -> Unit
-    ) = HttpClient(OkHttp) {
-        engine {
-            val chuckerCollector = ChuckerCollector(
-                context = context,
-                showNotification = false
-            )
-            val chuckerInterceptor = ChuckerInterceptor.Builder(context)
-                .collector(chuckerCollector)
-                .alwaysReadResponseBody(true)
-                .build()
-            addInterceptor(chuckerInterceptor)
+    ): HttpClient {
+        val cacheDir = File(context.cacheDir, "okhttp_cache").apply { mkdirs() }
+        val cache = Cache(
+            directory = cacheDir,
+            maxSize = diskCacheSize(cacheDir)
+        )
+        return HttpClient(OkHttp) {
+            engine {
+                config { cache(cache) }
+                addInterceptor(chuckerInterceptor)
+            }
+            decorator()
         }
-        decorator()
     }
 
     private suspend fun RefreshTokensParams.refreshSession(oldTokens: BearerTokens?): BearerTokens? {
@@ -114,6 +106,20 @@ class ApiInitializer : Initializer<Unit> {
         return sessionStore.updateBearer(sessionData)
     }
 
-    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
+    private fun diskCacheSize(cacheDir: File): Long = try {
+        val sm = context.getSystemService(StorageManager::class.java)
+        val uuid = sm.getUuidForPath(cacheDir)
+        val quota = sm.getCacheQuotaBytes(uuid)
+        (quota / 4).coerceIn(MIN_SIZE, MAX_SIZE).also { size ->
+            logcat { "diskCacheSize($cacheDir) = ${size.asHumanReadableBytes()}" }
+        }
+    } catch (e: Exception) {
+        logcat { e.asLog() }
+        MIN_SIZE
+    }
 
+    companion object {
+        private const val MIN_SIZE = 16L * 1024 * 1024
+        private const val MAX_SIZE = 256L * 1024 * 1024
+    }
 }

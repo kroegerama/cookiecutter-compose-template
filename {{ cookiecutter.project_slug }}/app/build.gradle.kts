@@ -89,7 +89,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.concurrent.futures)
     implementation(libs.androidx.core)
-    implementation(libs.androidx.startup)
     implementation(libs.androidx.window)
     implementation(libs.androidx.window.core)
     implementation(libs.kotlinx.coroutines.android)

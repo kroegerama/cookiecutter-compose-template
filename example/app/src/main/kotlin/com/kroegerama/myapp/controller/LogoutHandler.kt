@@ -18,7 +18,7 @@ class LogoutHandler @Inject constructor(
 ) {
     private var job: Job? = null
 
-    fun init() {
+    fun start() {
         job?.cancel()
         job = lifecycleOwner.lifecycleScope.launch {
             sessionStore.loggedInFlow.collect { loggedIn ->
