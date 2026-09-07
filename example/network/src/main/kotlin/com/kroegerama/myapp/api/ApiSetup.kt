@@ -52,6 +52,7 @@ class ApiSetup @Inject constructor(
             }
             install(Auth) {
                 bearer {
+                    nonCancellableRefresh = true
                     loadTokens {
                         sessionStore.getBearer()
                     }
