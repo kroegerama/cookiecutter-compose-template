@@ -33,7 +33,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        // a retained ViewModel means a recreation without system splash; holding the first frame would only blank the window
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && viewModel.loggedIn.value == null) {
             fromSplash()
         }
         enableEdgeToEdge(
