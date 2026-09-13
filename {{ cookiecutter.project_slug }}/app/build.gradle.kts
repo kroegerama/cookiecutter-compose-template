@@ -57,12 +57,24 @@ android {
     }
     buildFeatures {
         buildConfig = true
+        resValues = true
         compose = true
     }
     bundle {
         language {
             enableSplit = false
         }
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        val output = variant.outputs.single()
+        val versionStringKey = variant.makeResValueKey("string", "app_version")
+        val versionStringProvider = output.versionName.zip(output.versionCode) { versionName, versionCode ->
+            ResValue("$versionName ($versionCode)", "Value from variant: ${variant.name}")
+        }
+        variant.resValues.put(versionStringKey, versionStringProvider)
     }
 }
 
