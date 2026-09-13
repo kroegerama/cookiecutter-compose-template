@@ -28,7 +28,7 @@ kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.11.0"
 ksp = "2.3.12"
 logcat = "0.4"
-robolectric = "4.16.1"
+robolectric = "4.17"
 undercouch-download = "5.7.0"
 
 [libraries]
