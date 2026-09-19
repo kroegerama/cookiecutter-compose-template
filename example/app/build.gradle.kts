@@ -66,6 +66,12 @@ android {
             enableSplit = false
         }
     }
+    testOptions {
+        unitTests.all {
+            // Needed by Robolectric
+            it.jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
+        }
+    }
 }
 
 androidComponents {
@@ -132,6 +138,7 @@ dependencies {
     testImplementation(libs.androidx.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.compose.ui.test.junit4)

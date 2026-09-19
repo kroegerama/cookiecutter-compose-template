@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.milliseconds
@@ -16,8 +17,8 @@ import kotlin.time.TimeSource
 
 @Singleton
 class ProgressController @Inject constructor() {
-    private val active = mutableListOf<LoadingState>()
-    private val current = MutableStateFlow<LoadingState?>(null)
+    private val active = MutableStateFlow<List<LoadingState>>(emptyList())
+    private val current: Flow<LoadingState?> = active.map { it.lastOrNull() }.distinctUntilChanged()
 
     // undelayed; blocks input while the dialog is still in its show delay
     val busy: Flow<Boolean> = current.map { it != null }.distinctUntilChanged()
@@ -52,17 +53,11 @@ class ProgressController @Inject constructor() {
         val state = LoadingState(
             label = label
         )
-        synchronized(active) {
-            active += state
-            current.value = state
-        }
+        active.update { it + state }
         return try {
             block()
         } finally {
-            synchronized(active) {
-                active -= state
-                current.value = active.lastOrNull()
-            }
+            active.update { list -> list.filterNot { it === state } }
         }
     }
 

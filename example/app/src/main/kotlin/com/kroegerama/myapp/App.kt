@@ -22,6 +22,9 @@ class App : Application(), SingletonImageLoader.Factory {
     lateinit var logoutHandler: LogoutHandler
 
     @Inject
+    lateinit var currentActivityContext: CurrentActivityContext
+
+    @Inject
     lateinit var imageLoader: Lazy<ImageLoader>
 
     override fun onCreate() {
@@ -32,6 +35,7 @@ class App : Application(), SingletonImageLoader.Factory {
         )
         apiSetup.install()
         logoutHandler.start()
+        currentActivityContext.install()
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader = imageLoader.get()

@@ -1,6 +1,6 @@
 package com.kroegerama.myapp.ui.theme
 
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -20,7 +20,7 @@ fun AppTheme(
     CompositionLocalProvider(
         LocalDimensions provides dimensions
     ) {
-        MaterialTheme(
+        MaterialExpressiveTheme(
             colorScheme = LightColorScheme,
             motionScheme = MotionScheme.expressive(),
             shapes = Shapes,

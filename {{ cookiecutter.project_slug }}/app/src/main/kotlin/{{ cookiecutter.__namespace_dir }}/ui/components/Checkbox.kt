@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
@@ -38,13 +38,12 @@ fun Checkbox(
         modifier = modifier
             .heightIn(min = ButtonDefaults.MediumContainerHeight)
             .clip(MaterialTheme.shapes.small)
-            .selectable(
-                selected = checked,
+            .toggleable(
+                value = checked,
                 enabled = enabled,
-                role = Role.Checkbox
-            ) {
-                onCheckedChange(!checked)
-            }
+                role = Role.Checkbox,
+                onValueChange = onCheckedChange
+            )
             .padding(
                 horizontal = MaterialTheme.dimensions.medium,
                 vertical = MaterialTheme.dimensions.small

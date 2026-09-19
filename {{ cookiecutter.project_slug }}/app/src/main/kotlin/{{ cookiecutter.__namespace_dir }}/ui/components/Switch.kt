@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,13 +41,12 @@ fun Switch(
             .width(IntrinsicSize.Max)
             .heightIn(min = ButtonDefaults.MediumContainerHeight)
             .clip(MaterialTheme.shapes.small)
-            .selectable(
-                selected = checked,
+            .toggleable(
+                value = checked,
                 enabled = enabled,
-                role = Role.Switch
-            ) {
-                onCheckedChange(!checked)
-            }
+                role = Role.Switch,
+                onValueChange = onCheckedChange
+            )
             .padding(
                 horizontal = MaterialTheme.dimensions.medium
             )

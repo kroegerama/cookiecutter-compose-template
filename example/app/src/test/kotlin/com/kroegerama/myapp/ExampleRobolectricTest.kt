@@ -1,6 +1,7 @@
 package com.kroegerama.myapp
 
 import android.content.Context
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
@@ -16,6 +17,14 @@ import org.junit.runner.RunWith
 class ExampleRobolectricTest {
 
     private val context: Context = ApplicationProvider.getApplicationContext()
+
+    @Test
+    fun print_sdkInt() {
+        val full = Build.VERSION.SDK_INT_FULL
+        val major = Build.getMajorSdkVersion(full)
+        val minor = Build.getMinorSdkVersion(full)
+        println("Build SDK: $major.$minor")
+    }
 
     @Test
     fun appLabel_resolvesFromResources() {
