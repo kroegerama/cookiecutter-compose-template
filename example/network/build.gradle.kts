@@ -1,5 +1,4 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.library)
@@ -28,12 +27,7 @@ android {
 }
 
 kotlin {
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_21
-    }
+    jvmToolchain(21)
 }
 
 dependencies {
